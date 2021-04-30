@@ -1,11 +1,19 @@
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
 module.exports = {
   mode: 'production',
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'publish'),
+    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
+    assetModuleFilename: 'images/[hash][ext][query]',
   },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'main.css' // change this RELATIVE to your output.path!
+    })
+  ],
   module: {
     rules: [
       {
@@ -20,25 +28,16 @@ module.exports = {
       },
       {
         test: /\.scss$/i,
-        include: path.resolve(__dirname, 'src/assets/stylesheets'),
-        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
       },
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        include: path.resolve(__dirname, 'src/assets/images'),
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 8192,
-            },
-          },
-        ],
+        type: 'src/assets/images',
       },
     ],
   },
   devServer: {
-    contentBase: path.resolve(__dirname, 'publish'),
+    contentBase: path.resolve(__dirname, 'dist'),
     watchContentBase: true,
   },
 };
